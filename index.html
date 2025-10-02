@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Safety Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .guide-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Styles for the modal */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .nav-link {
+            transition: color 0.2s, border-bottom-color 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #3B82F6; /* blue-500 */
+            color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-2 text-2xl font-bold text-gray-800">
+                <i data-lucide="shield-check" class="text-blue-500"></i>
+                <span>Safety Hub</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link text-gray-600 hover:text-blue-500 pb-1 active" onclick="showSection('home', this)">Home</a>
+                <a href="#guides" class="nav-link text-gray-600 hover:text-blue-500 pb-1" onclick="showSection('guides', this)">Safety Guides</a>
+                <a href="#scam-spotter" class="nav-link text-gray-600 hover:text-blue-500 pb-1" onclick="showSection('scam-spotter', this)">Scam Spotter</a>
+                <a href="#uk-help" class="nav-link text-gray-600 hover:text-blue-500 pb-1" onclick="showSection('uk-help', this)">UK Resources</a>
+            </div>
+             <button class="md:hidden" onclick="toggleMobileMenu()">
+                <i data-lucide="menu" class="h-6 w-6"></i>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#home" class="block py-2 text-gray-600 hover:text-blue-500" onclick="showSection('home', this); toggleMobileMenu();">Home</a>
+            <a href="#guides" class="block py-2 text-gray-600 hover:text-blue-500" onclick="showSection('guides', this); toggleMobileMenu();">Safety Guides</a>
+            <a href="#scam-spotter" class="block py-2 text-gray-600 hover:text-blue-500" onclick="showSection('scam-spotter', this); toggleMobileMenu();">Scam Spotter</a>
+            <a href="#uk-help" class="block py-2 text-gray-600 hover:text-blue-500" onclick="showSection('uk-help', this); toggleMobileMenu();">UK Resources</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <!-- Home Section -->
+        <section id="home" class="text-center">
+            <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg">
+                <i data-lucide="shield-half" class="mx-auto h-16 w-16 text-blue-500"></i>
+                <h1 class="text-4xl md:text-5xl font-bold mt-6">Your Local Guide to Online Safety</h1>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Welcome! We're here to help residents of Alnwick and across the UK navigate the internet securely. Learn how to spot common scams, protect your accounts, and keep your personal information safe from threats.</p>
+                <div class="mt-8">
+                    <a href="#scam-spotter" class="bg-blue-500 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-600 transition duration-300" onclick="showSection('scam-spotter', document.querySelector('a[href=\'#scam-spotter\']'))">
+                        Is it a Scam? Check Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guides Section -->
+        <section id="guides" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-10">Online Safety Guides</h2>
+            <div id="guides-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Guide cards will be injected here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Scam Spotter Section -->
+        <section id="scam-spotter" class="hidden">
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-center mb-2">Interactive Scam Spotter</h2>
+                <p class="text-center text-gray-600 mb-8">Answer the questions to see if you might be dealing with a scam. This tool provides advice, not a guarantee.</p>
+                <div id="scam-checker-ui" class="text-center">
+                    <div id="question-container" class="mb-6">
+                        <p id="question-text" class="text-xl font-semibold min-h-[60px]"></p>
+                    </div>
+                    <div id="options-container" class="flex justify-center gap-4">
+                        <!-- Buttons will be here -->
+                    </div>
+                    <div id="result-container" class="mt-6 hidden">
+                         <div id="result-card" class="p-6 rounded-lg">
+                            <h3 id="result-title" class="text-2xl font-bold mb-2"></h3>
+                            <p id="result-explanation" class="text-gray-700"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UK Help Section -->
+        <section id="uk-help" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-10">Get Help in the UK</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12">If you've been targeted by a scam or need advice, these UK organisations are here to help. Don't hesitate to reach out.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Action Fraud -->
+                <a href="https://www.actionfraud.police.uk/" target="_blank" rel="noopener noreferrer" class="guide-card block bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center space-x-4 mb-3">
+                         <div class="bg-red-100 p-3 rounded-full">
+                            <i data-lucide="flag" class="h-6 w-6 text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Action Fraud</h3>
+                    </div>
+                    <p class="text-gray-600">The UK's national reporting centre for fraud and cybercrime. Report scams here to help the police track down criminals.</p>
+                </a>
+                <!-- Citizens Advice -->
+                 <a href="https://www.citizensadvice.org.uk/consumer/scams/get-help-with-scams/" target="_blank" rel="noopener noreferrer" class="guide-card block bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center space-x-4 mb-3">
+                         <div class="bg-blue-100 p-3 rounded-full">
+                            <i data-lucide="help-circle" class="h-6 w-6 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Citizens Advice</h3>
+                    </div>
+                    <p class="text-gray-600">Offers free, confidential advice online, over the phone, and in person on how to deal with the aftermath of a scam.</p>
+                </a>
+                <!-- NCSC -->
+                <a href="https://www.ncsc.gov.uk/" target="_blank" rel="noopener noreferrer" class="guide-card block bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center space-x-4 mb-3">
+                         <div class="bg-gray-800 p-3 rounded-full">
+                            <i data-lucide="laptop" class="h-6 w-6 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">National Cyber Security Centre</h3>
+                    </div>
+                    <p class="text-gray-600">Part of GCHQ, the NCSC provides expert advice for citizens and businesses on how to stay safe online.</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Guide Detail Modal -->
+    <div id="guide-modal" class="modal-backdrop">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-3xl modal relative">
+             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+            <div id="modal-content" class="p-8">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="text-center py-8 mt-12 border-t">
+        <p class="text-gray-500">&copy; 2025 Online Safety Hub. Serving Alnwick and the wider UK community.</p>
+        <p class="text-gray-400 text-sm mt-2">The information on this site is for general guidance only and does not constitute legal or financial advice.</p>
+    </footer>
+
+
+    <script>
+        // --- DATA ---
+        
+        const guides = [
+            {
+                id: 'phishing',
+                title: 'Spotting Phishing Scams',
+                icon: 'fish',
+                summary: 'Learn to recognize fraudulent emails, texts, and websites designed to steal your information.',
+                content: `
+                    <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="fish" class="mr-3 text-blue-500"></i>How to Spot Phishing</h3>
+                    <p class="mb-4">Phishing is when scammers use fake emails or texts to trick you into giving them your personal information. Be wary of these red flags:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Urgent or Threatening Language:</strong> Messages that say your account will be closed or you'll be fined if you don't act now.</li>
+                        <li><strong>Suspicious Links or Attachments:</strong> Hover over links to see the real destination URL. Never open attachments you weren't expecting.</li>
+                        <li><strong>Generic Greetings:</strong> Legitimate companies usually address you by name, not "Dear Customer."</li>
+                        <li><strong>Spelling and Grammar Mistakes:</strong> Professional organizations proofread their communications.</li>
+                        <li><strong>Requests for Personal Information:</strong> Your bank or other services will never ask for your password or full card number via email.</li>
+                    </ul>
+                    <p class="mt-6 font-semibold">What to do: If you suspect a phishing attempt, do not click any links. Delete the message and, if you're concerned, contact the company directly through their official website or phone number.</p>
+                `
+            },
+            {
+                id: 'passwords',
+                title: 'Creating Secure Passwords',
+                icon: 'key-round',
+                summary: 'Best practices for creating strong, unique passwords that are hard to crack.',
+                content: `
+                     <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="key-round" class="mr-3 text-blue-500"></i>Creating Strong Passwords</h3>
+                    <p class="mb-4">A strong password is your first line of defense. Here's how to create one:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Length is Key:</strong> Aim for at least 12 characters. The longer, the better.</li>
+                        <li><strong>Use a Mix of Characters:</strong> Include uppercase letters, lowercase letters, numbers, and symbols (e.g., !, @, #).</li>
+                        <li><strong>Avoid Personal Information:</strong> Don't use your name, birthday, or common words like "password" or "123456."</li>
+                        <li><strong>Make it Memorable (for you):</strong> Consider a passphrase, which is a sentence like "CorrectHorseBatteryStaple!" - it's long and easy to remember but hard to guess.</li>
+                        <li><strong>Use a Password Manager:</strong> A password manager can generate and store unique, complex passwords for all your accounts, so you only have to remember one master password.</li>
+                    </ul>
+                     <p class="mt-6 font-semibold">Pro Tip: Use a unique password for every single account. If one account is compromised, the others remain safe.</p>
+                `
+            },
+            {
+                id: '2fa',
+                title: 'Setting Up 2FA',
+                icon: 'smartphone-lock',
+                summary: 'Add an extra layer of security to your accounts with Two-Factor Authentication.',
+                content: `
+                    <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="smartphone-lock" class="mr-3 text-blue-500"></i>Understanding Two-Factor Authentication (2FA)</h3>
+                    <p class="mb-4">2FA adds a second step to your login process, making it much harder for attackers to get into your accounts even if they have your password. It works by requiring two things:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Something you know:</strong> Your password.</li>
+                        <li><strong>Something you have:</strong> A code from your phone (via an app or text) or a physical security key.</li>
+                    </ul>
+                     <p class="mt-6 font-semibold">How to enable it: Look in the "Security" or "Account" settings of your favorite services (email, social media, banking). Most major platforms offer 2FA. We highly recommend using an authenticator app (like Google Authenticator or Authy) over SMS texts for better security.</p>
+                `
+            },
+            {
+                id: 'shopping',
+                title: 'Safe Online Shopping',
+                icon: 'shopping-cart',
+                summary: 'Tips for keeping your payment details safe when shopping on the internet.',
+                content: `
+                     <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="shopping-cart" class="mr-3 text-blue-500"></i>How to Shop Online Safely</h3>
+                    <p class="mb-4">Enjoy the convenience of online shopping without the risk. Follow these tips:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Look for "https":</strong> Ensure the website address starts with "https://" and has a padlock icon in the address bar. This means the connection is encrypted.</li>
+                        <li><strong>Stick to Reputable Retailers:</strong> If a deal on an unknown site seems too good to be true, it probably is.</li>
+                        <li><strong>Use a Credit Card:</strong> Credit cards often offer better fraud protection than debit cards. You can also use secure payment services like PayPal.</li>
+                        <li><strong>Avoid Public Wi-Fi:</strong> Don't enter payment details when connected to public, unsecured Wi-Fi networks in cafes or airports.</li>
+                        <li><strong>Check Statements Regularly:</strong> Keep an eye on your bank and card statements for any unauthorized charges.</li>
+                    </ul>
+                `
+            },
+             {
+                id: 'social_media',
+                title: 'Social Media Safety',
+                icon: 'users',
+                summary: 'Protect your privacy and personal information on social media platforms.',
+                content: `
+                    <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="users" class="mr-3 text-blue-500"></i>Staying Safe on Social Media</h3>
+                    <p class="mb-4">Social media is for connecting, but it's important to protect your privacy. Here's how:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Review Your Privacy Settings:</strong> Limit who can see your posts and personal information. Set your profile to "Friends Only" or private.</li>
+                        <li><strong>Think Before You Post:</strong> Don't share sensitive information like your home address, phone number, or specific location details.</li>
+                        <li><strong>Be Wary of Friend Requests:</strong> Don't accept requests from people you don't know. They could be fake profiles created by scammers.</li>
+                        <li><strong>Recognize Quiz Scams:</strong> Fun-looking quizzes that ask for your pet's name or first car are often designed to gather answers to common security questions.</li>
+                        <li><strong>Report and Block:</strong> If you see suspicious activity or receive harassing messages, use the platform's tools to report and block the user.</li>
+                    </ul>
+                `
+            },
+             {
+                id: 'investment',
+                title: 'Investment & Crypto Scams',
+                icon: 'trending-up',
+                summary: 'How to spot fake investment opportunities that promise guaranteed high returns.',
+                content: `
+                     <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="trending-up" class="mr-3 text-blue-500"></i>Avoiding Investment Scams</h3>
+                    <p class="mb-4">Scammers lure victims with promises of easy money. Watch out for these warning signs:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>Guaranteed High Returns:</strong> All investments carry risk. Anyone promising guaranteed high returns with little or no risk is lying.</li>
+                        <li><strong>Pressure to Act Fast:</strong> Scammers create a sense of urgency, telling you it's a "limited-time offer" to prevent you from doing research.</li>
+                        <li><strong>Unsolicited Offers:</strong> Be very suspicious of unexpected DMs, emails, or calls about amazing investment opportunities.</li>
+                        <li><strong>Vague Details:</strong> Legitimate investments have clear documentation. Scammers are often vague about how the investment works.</li>
+                        <li><strong>Crypto-Only Payments:</strong> While crypto is a legitimate asset, many scams insist on payment in cryptocurrency because it's difficult to trace and recover.</li>
+                    </ul>
+                     <p class="mt-6 font-semibold">Rule of thumb: If you don't understand the investment, don't put money into it. Seek advice from a qualified financial advisor.</p>
+                `
+            },
+            {
+                id: 'uk_specific',
+                title: 'UK-Specific Scams',
+                icon: 'building-2',
+                summary: 'Watch out for common UK scams relating to HMRC, council tax, TV Licensing, and the NHS.',
+                content: `
+                     <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="building-2" class="mr-3 text-blue-500"></i>Common Scams in the UK</h3>
+                    <p class="mb-4">Scammers often impersonate official UK organisations to appear legitimate. Be extra cautious if you receive communication about:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li><strong>HMRC Tax Rebates:</strong> HMRC will never text or email you about a tax refund. They only contact you by post or through your online government gateway account.</li>
+                        <li><strong>Council Tax Reductions:</strong> Be wary of calls or messages offering to reduce your council tax band for a fee. You can check and challenge your band for free via the Valuation Office Agency (VOA).</li>
+                        <li><strong>TV Licensing Threats:</strong> Fake TV Licensing emails threaten you with a fine for non-payment. Always check the sender's email address and log in to the official TV Licensing website to check your status.</li>
+                        <li><strong>NHS Contact:</strong> The NHS will never ask for payment or bank details. Any message asking for money for a test or vaccine is a scam.</li>
+                    </ul>
+                     <p class="mt-6 font-semibold">What to do: If you're unsure about a message from an official body, find their official contact details (don't use the ones in the message) and get in touch with them directly to verify it.</p>
+                `
+            }
+        ];
+        
+        const scamQuestions = {
+            start: {
+                question: "Did the offer or message come unexpectedly out of the blue?",
+                yes: "unexpected",
+                no: "expected"
+            },
+            unexpected: {
+                question: "Is it asking you to act with extreme urgency (e.g., 'act now or your account will be deleted')?",
+                yes: "urgent",
+                no: "unexpected_not_urgent"
+            },
+            expected: {
+                question: "Even though you were expecting it, does something feel 'off' (e.g., bad grammar, generic greeting)?",
+                yes: "urgent", // Same logic as urgent pressure
+                no: "safe_ish"
+            },
+            unexpected_not_urgent: {
+                 question: "Does the offer seem too good to be true (e.g., winning a lottery you never entered, guaranteed high returns on an investment)?",
+                 yes: "too_good",
+                 no: "safe_ish"
+            },
+            urgent: {
+                question: "Is it asking you to click a link, download an attachment, or provide personal info (like a password or bank details)?",
+                yes: "high_risk_action",
+                no: "medium_risk"
+            },
+            safe_ish: {
+                 question: "Is the message asking for payment in an unusual way (e.g., gift cards, wire transfer, cryptocurrency)?",
+                 yes: "unusual_payment",
+                 no: "result_low"
+            },
+            too_good: {
+                 result: "high",
+                 title: "High Risk of Scam",
+                 explanation: "Offers that seem too good to be true almost always are. This is a classic tactic to prey on hope. Do not proceed."
+            },
+            high_risk_action: {
+                 result: "high",
+                 title: "High Risk of Scam",
+                 explanation: "Never click suspicious links or provide personal data in response to an unsolicited, urgent message. This is a classic phishing attempt to steal your information."
+            },
+            medium_risk: {
+                question: "Is the sender's email or phone number unfamiliar, or pretending to be from a well-known company?",
+                yes: "high_risk_action",
+                no: "result_medium"
+            },
+            unusual_payment: {
+                result: "high",
+                 title: "High Risk of Scam",
+                 explanation: "Legitimate businesses will not ask for payment in gift cards, wire transfers, or crypto. These methods are untraceable and a huge red flag for a scam."
+            },
+            result_low: {
+                result: "low",
+                title: "Likely Safe, But Stay Alert",
+                explanation: "Based on your answers, this might be legitimate. However, always remain cautious. Double-check sender details and never give out personal information unless you are 100% sure who you are talking to."
+            },
+            result_medium: {
+                result: "medium",
+                title: "Use Caution - Potential Scam",
+                explanation: "There are some warning signs here. It's best to pause and verify. Contact the person or company through an official channel (not by replying to the message) to confirm if the request is real."
+            }
+        };
+
+
+        // --- UI & LOGIC ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            populateGuides();
+            startScamChecker();
+        });
+
+        // --- Navigation Logic ---
+        function showSection(sectionId, navElement) {
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            navElement.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Guides Logic ---
+        const guidesGrid = document.getElementById('guides-grid');
+        function populateGuides() {
+            guidesGrid.innerHTML = guides.map(guide => `
+                <div class="guide-card bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="openModal('${guide.id}')">
+                    <div class="flex items-center space-x-4 mb-3">
+                         <div class="bg-blue-100 p-3 rounded-full">
+                            <i data-lucide="${guide.icon}" class="h-6 w-6 text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">${guide.title}</h3>
+                    </div>
+                    <p class="text-gray-600">${guide.summary}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        const modal = document.getElementById('guide-modal');
+        const modalContent = document.getElementById('modal-content');
+        function openModal(guideId) {
+            const guide = guides.find(g => g.id === guideId);
+            modalContent.innerHTML = guide.content;
+            modal.style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+
+        // --- Scam Spotter Logic ---
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultContainer = document.getElementById('result-container');
+        const resultCard = document.getElementById('result-card');
+        const resultTitle = document.getElementById('result-title');
+        const resultExplanation = document.getElementById('result-explanation');
+
+        let currentNodeKey = 'start';
+
+        function startScamChecker() {
+            currentNodeKey = 'start';
+            const node = scamQuestions[currentNodeKey];
+            displayQuestion(node);
+        }
+
+        function displayQuestion(node) {
+            questionText.textContent = node.question;
+            optionsContainer.innerHTML = `
+                <button class="bg-green-500 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-600 transition" onclick="handleAnswer('yes')">Yes</button>
+                <button class="bg-red-500 text-white font-semibold px-8 py-3 rounded-lg hover:bg-red-600 transition" onclick="handleAnswer('no')">No</button>
+            `;
+            optionsContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+        }
+
+        function displayResult(node) {
+            questionText.textContent = "Analysis Complete";
+            resultTitle.textContent = node.title;
+            resultExplanation.textContent = node.explanation;
+            
+            resultCard.classList.remove('bg-green-100', 'bg-yellow-100', 'bg-red-100', 'border-green-500', 'border-yellow-500', 'border-red-500');
+            resultCard.classList.add('border-2');
+
+            if (node.result === 'low') {
+                resultCard.classList.add('bg-green-100', 'border-green-500');
+                resultTitle.classList.add('text-green-800');
+            } else if (node.result === 'medium') {
+                resultCard.classList.add('bg-yellow-100', 'border-yellow-500');
+                 resultTitle.classList.add('text-yellow-800');
+            } else {
+                resultCard.classList.add('bg-red-100', 'border-red-500');
+                 resultTitle.classList.add('text-red-800');
+            }
+
+            optionsContainer.innerHTML = `<button class="bg-blue-500 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-600 transition" onclick="startScamChecker()">Start Over</button>`;
+            resultContainer.classList.remove('hidden');
+        }
+
+        function handleAnswer(answer) {
+            const currentNode = scamQuestions[currentNodeKey];
+            const nextNodeKey = currentNode[answer];
+            const nextNode = scamQuestions[nextNodeKey];
+            currentNodeKey = nextNodeKey;
+
+            if (nextNode.result) {
+                displayResult(nextNode);
+            } else {
+                displayQuestion(nextNode);
+            }
+        }
+    </script>
+</body>
+</html>
+
